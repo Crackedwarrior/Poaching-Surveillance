@@ -187,9 +187,3 @@ pytest
 
 This project is licensed under the MIT License for educational and research use.
 You may modify and redistribute it under the same license terms.
-
----
-
-### Recommended Resume Line
-
-Developed a CNN-powered Flask application for wildlife poaching detection, automating image classification and alerting, reducing manual monitoring by approximately 80%.
