@@ -1,1 +1,29 @@
+# Environment variables
+.env
 venv/
+venv_new/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# IDE files
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+*.temp
+
+# Large model files (not tracked)
+*.pt
+*.h5
+*.pkl
