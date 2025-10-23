@@ -1,4 +1,4 @@
-# WildlifeGuard – AI-Powered Poaching Detection System (Flask)
+# Wildlife Image Classifier - Anti Poaching Surveillance Tool (Flask)
 
 **Production-Ready** wildlife surveillance system built with Python, Flask, TensorFlow, and computer vision.  
 Deployed for real-world conservation monitoring with automated SMS alerts and comprehensive image analysis capabilities.
