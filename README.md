@@ -16,8 +16,8 @@ Deployed for real-world conservation monitoring with automated SMS alerts and co
 ## Tech Stack
 
 **Backend:** Python, Flask, TensorFlow, Keras, OpenCV  
-**AI/ML:** Convolutional Neural Networks (CNN), Object Detection Models  
-**Integration:** Twilio SMS API, IP-based Geolocation  
+**AI/ML:** Convolutional Neural Networks (CNN)  
+**Integration:** Twilio SMS API  
 **Frontend:** HTML5, CSS3, JavaScript  
 **Storage:** Local file system with organized image management
 
@@ -26,11 +26,10 @@ Deployed for real-world conservation monitoring with automated SMS alerts and co
 ## Key Tools and Dependencies
 
 * TensorFlow/Keras – CNN model loading and inference
-* OpenCV – Image processing and computer vision
+* OpenCV – Image processing
 * Flask – Lightweight web framework for API endpoints
 * Twilio API – Real-time SMS alert system
 * NumPy – Numerical computing for image data
-* Ultralytics – Object detection model integration
 
 ---
 
@@ -38,7 +37,7 @@ Deployed for real-world conservation monitoring with automated SMS alerts and co
 
 * Real-time CNN-based poaching detection with 96.3% accuracy
 * Batch image processing with intelligent fallback detection systems
-* Automated SMS alerts with geolocation data for conservation authorities
+* Automated SMS alerts for conservation authorities
 * Clean, minimalistic web interface for surveillance image upload
 * Robust error handling with automatic model fallback mechanisms
 * Comprehensive performance metrics and detection analytics
@@ -101,16 +100,16 @@ Then open your browser and navigate to:
 ## Screenshots
 
 ### System Interface
-![Poaching Detection Interface](screenshots/POACHING%20DETECTION.png)
+<img src="screenshots/POACHING%20DETECTION.png" width="600" alt="Poaching Detection Interface">
 *Clean, minimalistic web interface for uploading and analyzing surveillance images*
 
 ### Detection Results
-![No Poaching Detection](screenshots/NO%20POACHING.png)
+<img src="screenshots/NO%20POACHING.png" width="600" alt="No Poaching Detection">
 *System correctly identifying wildlife scenes with no poaching activity*
 
 ### SMS Alert Confirmation
-![Twilio SMS Confirmation](screenshots/Twilio%20Confirmation.jpeg)
-*Real-time SMS alerts sent to authorities when poaching activity is detected*
+<img src="screenshots/Twilio%20Confirmation.jpeg" width="400" alt="Twilio SMS Confirmation">
+*SMS alerts sent to authorities when poaching activity is detected*
 
 ---
 
@@ -170,7 +169,7 @@ Poaching-Surveillance/
 ## Alert System
 
 * Automated SMS alerts triggered when poaching activity exceeds 10% threshold
-* Real-time geolocation data included in alert messages
+* Automated alert system for immediate notification
 * Twilio integration for instant conservation authority notification
 * Fallback messaging system for network connectivity issues
 

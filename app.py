@@ -42,12 +42,7 @@ def upload_folder():
             noperson = 0
 
             # SMS INTEGRATION
-            try:
-                response = requests.get("http://ip-api.com/json/", timeout=5).json()
-                message1 = f"The region of poaching is {response['region']} {response['city']} latitude is {response['lat']} longitude is {response['lon']}"
-            except requests.exceptions.RequestException as e:
-                print(f"Location retrieval failed: {e}")
-                message1 = "Poaching detected in wildlife area - immediate attention required"
+            message1 = "Poaching detected in wildlife area - immediate attention required"
 
             # Process images in the folder
             for picture in os.listdir(folder_path):
