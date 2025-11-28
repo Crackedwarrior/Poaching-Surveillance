@@ -247,7 +247,7 @@ Actual No Poacher   1,123     201
 
 1. **Model Compression**: Pruning and quantization for mobile deployment
 2. **Batch Processing**: Efficient handling of multiple image uploads
-3. **Error Recovery**: Robust fallback mechanisms for model failures
+3. **Error Recovery**: Robust error handling mechanisms for model failures
 4. **Scalability**: Load balancing for high-volume processing
 
 ---

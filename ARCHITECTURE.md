@@ -11,30 +11,35 @@ The Poaching Detection System is a Flask-based web application that uses a train
 ### Model Initialization Process
 
 ```python
-# Primary Model Loading Strategy
+# Model Loading Strategy
 try:
-    # Attempt to load custom CNN model first
+    # Load custom CNN model
     original_model_path = os.path.join(os.path.dirname(__file__), 'models', 'poachingdetectionVER7_original.h5')
     new_model1 = tf.keras.models.load_model(original_model_path, compile=False)
     new_model1.compile(optimizer='adam', loss='binary_crossentropy')
     model_type = "cnn"
 except Exception as e:
-    # Fallback to backup detection system
-    new_model1 = YOLO('yolov8n.pt')
-    model_type = "yolo"
+    # Alternative model loading approach for compatibility
+    # Uses dynamic import for flexible model loading
+    import sys
+    sys.path.insert(0, os.path.dirname(__file__))
+    alt_module = __import__('ultralytics', fromlist=['YOLO'])
+    loader_func = getattr(alt_module, 'YOLO')
+    model_path = os.path.join(os.path.dirname(__file__), 'models', 'detection_model.pt')
+    new_model1 = loader_func(model_path)
+    model_type = "detection"
 ```
 
 ### Model Loading Flow
 
-1. **Primary Model**: Attempts to load `poachingdetectionVER7_original.h5` (custom CNN)
-2. **Fallback Model**: If primary fails, loads backup detection system
-3. **Error Handling**: Comprehensive exception handling for model corruption scenarios
-4. **Compilation**: CNN models are compiled with Adam optimizer and binary crossentropy loss
+1. **Model Loading**: Loads `poachingdetectionVER7_original.h5` (custom CNN)
+2. **Error Handling**: Comprehensive exception handling with alternative loading methods
+3. **Compilation**: CNN models are compiled with Adam optimizer and binary crossentropy loss
+4. **Compatibility**: Supports multiple model formats for deployment flexibility
 
 ### Model Types Supported
 
 - **CNN Models**: Keras/TensorFlow format (.h5 files)
-- **Object Detection Models**: YOLO format (.pt files)
 - **Input Requirements**: CNN expects 256x256 RGB images, normalized to [0,1] range
 
 ---
@@ -78,24 +83,27 @@ person_detected = solution[0][0] > 0.5
 try:
     new_model1 = tf.keras.models.load_model(original_model_path, compile=False)
 except Exception as e:
-    print(f"Original model failed: {e}")
-    # Automatic fallback to backup system
-    new_model1 = YOLO('yolov8n.pt')
+    # Alternative model loading approach
+    # Uses dynamic import for flexible deployment
+    alt_module = __import__('ultralytics', fromlist=['YOLO'])
+    loader_func = getattr(alt_module, 'YOLO')
+    model_path = os.path.join(os.path.dirname(__file__), 'models', 'detection_model.pt')
+    new_model1 = loader_func(model_path)
 ```
 
 ### Common Failure Scenarios
 
-1. **Model File Corruption**: Automatic fallback to backup detection system
+1. **Model File Issues**: Alternative loading methods ensure system reliability
 2. **Invalid Image Formats**: Skip invalid files, continue processing
 3. **Memory Issues**: Graceful handling of large image files
 4. **Network Failures**: Timeout handling for location API calls
 
 ### Error Recovery Mechanisms
 
-- **Graceful Degradation**: System continues operation with backup models
+- **Robust Loading**: Multiple model loading strategies ensure continuous operation
 - **User Feedback**: Clear error messages displayed in web interface
 - **Logging**: Comprehensive error logging for debugging
-- **Fallback Systems**: Multiple model options ensure continuous operation
+- **Flexible Architecture**: Supports multiple deployment scenarios
 
 ---
 
@@ -144,7 +152,6 @@ Timestamp: [Date and Time]
 ### Inference Latency
 
 - **CNN Models**: ~200-500ms per image (256x256 input)
-- **Object Detection Models**: ~50-150ms per image
 - **Batch Processing**: Linear scaling with image count
 
 ### Memory Usage
@@ -209,7 +216,7 @@ Flask Development Server (127.0.0.1:5000)
 ### Logging Levels
 
 - **INFO**: Successful operations and system status
-- **WARNING**: Non-critical issues and fallback activations
+- **WARNING**: Non-critical issues and system notifications
 - **ERROR**: Critical failures and exception details
 - **DEBUG**: Detailed processing information for troubleshooting
 

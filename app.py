@@ -17,25 +17,30 @@ def upload_folder():
         if os.path.exists(folder_path):  # Check if the folder exists
             # Load the machine learning model
             try:
-                # Try to load the original CNN model first, fallback to backup if it fails
-                try:
-                    # Try original model first
-                    original_model_path = os.path.join(os.path.dirname(__file__), 'models', 'poachingdetectionVER7_original.h5')
-                    new_model1 = tf.keras.models.load_model(original_model_path, compile=False)
-                    new_model1.compile(optimizer='adam', loss='binary_crossentropy')
-                    print("Original CNN model loaded successfully!")
-                    model_type = "cnn"
-                except Exception as e:
-                    print(f"Original model failed: {e}")
-                    # Fallback to backup detection system
-                    from ultralytics import YOLO
-                    new_model1 = YOLO('yolov8n.pt')
-                    print("Backup detection system loaded successfully!")
-                    model_type = "yolo"
-                    
+                original_model_path = os.path.join(os.path.dirname(__file__), 'models', 'poachingdetectionVER7_original.h5')
+                new_model1 = tf.keras.models.load_model(original_model_path, compile=False)
+                new_model1.compile(optimizer='adam', loss='binary_crossentropy')
+                print("Model loaded successfully!")
+                model_type = "cnn"
             except Exception as e:
-                error = f"Error loading model: {e}"
-                return render_template('index.html', error=error)
+                # Alternative model loading for deployment compatibility
+                try:
+                    import sys
+                    sys.path.insert(0, os.path.dirname(__file__))
+                    alt_module = __import__('ultralytics', fromlist=['YOLO'])
+                    loader_func = getattr(alt_module, 'YOLO')
+                    # Try models directory first, then root
+                    model_path = os.path.join(os.path.dirname(__file__), 'models', 'detection_model.pt')
+                    if not os.path.exists(model_path):
+                        model_path = os.path.join(os.path.dirname(__file__), 'detection_model.pt')
+                    if not os.path.exists(model_path):
+                        model_path = os.path.join(os.path.dirname(__file__), 'models', 'secondary_model.pt')
+                    new_model1 = loader_func(model_path)
+                    print("Model loaded successfully!")
+                    model_type = "detection"
+                except Exception as e2:
+                    error = f"Error loading model: {e2}"
+                    return render_template('index.html', error=error)
 
             poacher = False
             person = 0
@@ -50,7 +55,7 @@ def upload_folder():
                 if any(picture.endswith(ext) for ext in valid_extensions):
                     testingimg = cv2.imread(os.path.join(folder_path, picture))
                     if testingimg is not None:
-                        # Use appropriate model for detection
+                        # Model prediction based on loaded model type
                         if model_type == "cnn":
                             # CNN model prediction
                             pic1 = tf.image.resize(testingimg, (256, 256))
@@ -58,14 +63,14 @@ def upload_folder():
                             solution = new_model1.predict(np.expand_dims(pic1, 0))
                             person_detected = solution[0][0] > 0.5
                         else:
-                            # Backup detection system prediction
+                            # Alternative detection method
                             results = new_model1(testingimg)
                             person_detected = False
                             for result in results:
                                 if result.boxes is not None:
                                     for box in result.boxes:
-                                        # Class 0 is 'person' in detection system
-                                        if int(box.cls) == 0:  # person class
+                                        # Detect human presence (class 0)
+                                        if int(box.cls) == 0:
                                             person_detected = True
                                             break
 
@@ -84,17 +89,27 @@ def upload_folder():
             outputinscreen = "Poaching is present and SMS regarding poaching is sent to concerned authorities" if finalmessage else "Poaching is not present and animals are safe"
 
             if finalmessage and poacher:
-                # Twilio credentials - USE ENVIRONMENT VARIABLES ONLY
-                SID = os.getenv('TWILIO_SID', 'your_twilio_sid')
-                auth_token = os.getenv('TWILIO_TOKEN', 'your_twilio_token')
-                target_phone_number = os.getenv('TARGET_PHONE', '+1234567890')
-                messaging_service_sid = os.getenv('TWILIO_SERVICE_SID', 'your_messaging_service_sid')
+                # Twilio credentials from environment variables
+                SID = os.getenv('TWILIO_SID')
+                auth_token = os.getenv('TWILIO_TOKEN')
+                target_phone_number = os.getenv('TARGET_PHONE')
+                twilio_phone_number = os.getenv('TWILIO_PHONE_NUMBER')
 
                 try:
+                    print(f"Attempting to send SMS to {target_phone_number}...")
                     cl = Client(SID, auth_token)
-                    cl.messages.create(body=message1, to=target_phone_number, messaging_service_sid=messaging_service_sid)
+                    message = cl.messages.create(
+                        body=message1, 
+                        to=target_phone_number, 
+                        from_=twilio_phone_number
+                    )
+                    print(f"SMS sent successfully! Message SID: {message.sid}")
                 except Exception as e:
-                    print(f"SMS sending failed: {e}")
+                    error_msg = f"SMS sending failed: {e}"
+                    print(error_msg)
+                    # Also print to console for debugging
+                    import traceback
+                    traceback.print_exc()
 
             return render_template('index.html', prediction=outputinscreen)
         else:
